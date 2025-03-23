@@ -2,7 +2,7 @@
 
 library(raster)
 library(parallel) # For faster processing
-library(rgdal)
+#library(rgdal)
 #library(rgl)
 library(plot3D)
 library(mgcv)
@@ -43,6 +43,7 @@ height_variation <- function(write=TRUE, return=FALSE) {
   # Fractal dimension, D
   temp <- data.frame()
   for (s in scl) {
+    cat("s:", s, "\n")
     inc <- seq(0, L-s, s)
     x <- rep(inc, L/s)
     y <- rep(inc, each=L/s)
@@ -70,12 +71,22 @@ rdh <- function(hvar) {
   # points(H0 ~ L0, hvar_m, col="red")
   
   # Find the height ranges at both ends of the scale
-  H <- 10^hvar_m$H0[hvar_m$L0==log10(L)]
-  H0 <- 10^hvar_m$H0[hvar_m$L0==log10(L0)]
+  tolerance <- 1e-8  # Define a small tolerance level
+  H <- 10^hvar_m$H0[abs(hvar_m$L0 - log10(L)) < tolerance]
+  H0 <- 10^hvar_m$H0[abs(hvar_m$L0 - log10(L0)) < tolerance]
+  
+  cat("log10(L)", log10(L), "\n")
+  cat("hvar_m$L0", hvar_m$L0, "\n")
+  cat("abs(hvar_m$L0 - log10(L0)) < tolerance", abs(hvar_m$L0 - log10(L0)) < tolerance, "\n")
+  
+
+  cat("H", H, "\n")
+  cat("H0", H0, "\n")
+  
 
   # Re-centering, probably unnessary
-  hvar_m$H0 <- hvar_m$H0 - hvar_m$H0[hvar_m$L0==log10(L)]
-  hvar_m$L0 <- hvar_m$L0 - log10(L)
+  # hvar_m$H0 <- hvar_m$H0 - hvar_m$H0[hvar_m$L0==log10(L)]
+  # hvar_m$L0 <- hvar_m$L0 - log10(L)
 
   # Calculate slopes and minus from 3 (i.e., to get D from S)
   mod <- lm(H0 ~ L0, hvar_m)
