@@ -105,6 +105,9 @@ rdh <- function(hvar) {
   # Optional test: calculating R using another method
   temp3 <- crop(data, extent(x0, x0 + L, y0, y0 + L))
   temp3 <- as(temp3, 'SpatialGridDataFrame')
+  
+  cat("surfaceArea: ", surfaceArea(temp3), '\n')
+  cat("L^2", L^2, '\n')
   R <- surfaceArea(temp3) / L^2
   
   # Calcualte D from theory

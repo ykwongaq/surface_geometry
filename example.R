@@ -2,30 +2,32 @@
 source("R/functions.R")
 
 dataset_list <- list(
-  #"BOU_C4_D"
+  #"BOU_C4_D",
   #"BOU_C13_D"
-  #"DIA_C5_A"
-  #"DIA_C8_D"
-  #"DIA_C12_DA"
-  #"DIA_C13_A"
-  #"GRO_C6_A"
-  #"GRO_C12_D"
-  #"PIH_C7_D"
-  #"PIH_C18_A"
+  #"DIA_C5_A",
+  #"DIA_C8_D",
+  #"DIA_C12_DA",
+  #"DIA_C13_A",
+  #"GRO_C6_A",
+  #"GRO_C12_D",
+  #"PIH_C7_D",
+  #"PIH_C18_A",
   #"TIA_C12_DA"
-  #"TIA_C24_1"
-  #"UNU_C16_A"
+  #"TIA_C24_1",
+  #"UNU_C16_A",
   "UNU_C17_DA"
+  #"SyntheticReef_500"
 )
 
 for (dataset_name in dataset_list) {
   cat("processing dataset: ", dataset_name, "\n")
   dataset = dataset_name
   
-  base_folder <- "data"
+  base_folder <- "higres_data"
   data_file <- file.path(base_folder, dataset, paste0(dataset, ".tif"))
+  print("read csv")
   coordinate_file <- file.path(base_folder, dataset, "coordinate.csv")
-  
+  print("finish csv")
   coordinate_list <- read.csv(coordinate_file, header = TRUE)
   
   print(dataset)
@@ -48,8 +50,11 @@ for (dataset_name in dataset_list) {
   points <- rbind(point1, point2, point3, point4)
   
   # Calculate the bottom-right corner (x0, y0)
-  x0 <- min(points[, 1]) # Maximum x-coordinate
+  x0 <- min(points[, 1]) # Minimum x-coordinate
   y0 <- min(points[, 2]) # Minimum y-coordinate
+  
+  cat("x0", x0, "\n")
+  cat("y0", y0, "\n")
   
   # Calculate the size L as the distance between point 1 and point 2
   L <- sqrt((point1[1] - point2[1])^2 + (point1[2] - point2[2])^2)
@@ -87,4 +92,13 @@ for (dataset_name in dataset_list) {
   print("calculating rugosity")
   result = rdh(example)
   print(result)
+  
+  # Convert the result (list) into a data frame
+  result_df <- as.data.frame(result)
+  output_path <- file.path(base_folder, dataset, "result.csv")
+  
+  # Write the result to a CSV file
+  write.csv(result_df, file = output_path, row.names = FALSE)
+  
+  cat("Result saved to:", output_path, "\n")
 }
