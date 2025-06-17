@@ -2,28 +2,22 @@
 source("R/functions.R")
 
 dataset_list <- list(
-  #"BOU_C4_D",
-  #"BOU_C13_D"
-  #"DIA_C5_A",
-  #"DIA_C8_D",
-  #"DIA_C12_DA",
-  #"DIA_C13_A",
-  #"GRO_C6_A",
-  #"GRO_C12_D",
-  #"PIH_C7_D",
-  #"PIH_C18_A",
-  #"TIA_C12_DA"
-  #"TIA_C24_1",
-  #"UNU_C16_A",
-  "UNU_C17_DA"
-  #"SyntheticReef_500"
+  #"CoralReef1_100",
+  "CoralReef3_150",
+  "CoralReef3_200",
+  "CoralReef3_250",
+  "CoralReef3_300",
+  "CoralReef3_350",
+  "CoralReef3_400",
+  "CoralReef3_450",
+  "CoralReef3_500"
 )
 
 for (dataset_name in dataset_list) {
   cat("processing dataset: ", dataset_name, "\n")
   dataset = dataset_name
   
-  base_folder <- "higres_data"
+  base_folder <- "SynetheticCoralReefs/SynetheticCoralReef3_medium"
   data_file <- file.path(base_folder, dataset, paste0(dataset, ".tif"))
   print("read csv")
   coordinate_file <- file.path(base_folder, dataset, "coordinate.csv")
@@ -58,7 +52,7 @@ for (dataset_name in dataset_list) {
   
   # Calculate the size L as the distance between point 1 and point 2
   L <- sqrt((point1[1] - point2[1])^2 + (point1[2] - point2[2])^2)
-  cat("L", L)
+  cat("L", L, "\n")
   
   scl <- L / c(1, 2, 4, 8, 16, 32, 64, 128) # Scales, aim for 2 orders of magnitude
   L0 <- min(scl) # Grain, resolution of processing ~ 6 cm
@@ -78,15 +72,21 @@ for (dataset_name in dataset_list) {
   
   # Calulate height variation at different scales (scl) within patch, and save output (because a time-consuming step)
   print("Calculating height variation")
-  output_path <- paste0("output/", output, "/var_", names(data), "_0001.csv")
+  output_folder <- paste0(base_folder, "_output/")
+  if (!dir.exists(output_folder)) {
+    dir.create(output_folder, recursive = TRUE)
+    cat("Folder created at: ", output_folder, "\n")
+  } 
+  
+  output_path <- paste0(output_folder, names(data), ".csv")
   if (file.exists(output_path)) {
     # Do nothing
   } else {
-    example <- height_variation(write=TRUE, return=TRUE)
+    example <- height_variation(output_path, write=TRUE, return=TRUE)
   }
   
   # Load the file if starting here:
-  example <- read.csv(paste0("output/", output, "/var_", names(data), "_0001.csv"), as.is=TRUE)
+  example <- read.csv(output_path, as.is=TRUE)
   
   # Calculate rugosit, fractal dimension and height range (rdh function)
   print("calculating rugosity")

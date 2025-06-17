@@ -39,11 +39,10 @@ HL0_func <- function(D, R, L, L0) {
 
 # Main functions
 
-height_variation <- function(write=TRUE, return=FALSE) {
+height_variation <- function(output_path, write=TRUE, return=FALSE) {
   # Fractal dimension, D
   temp <- data.frame()
   for (s in scl) {
-    cat("s:", s, "\n")
     inc <- seq(0, L-s, s)
     x <- rep(inc, L/s)
     y <- rep(inc, each=L/s)
@@ -52,7 +51,7 @@ height_variation <- function(write=TRUE, return=FALSE) {
   }
   # This variation method is time-consuming, and so save the result to avoid reprocessing if recalculting RDH
   if (write) {
-    write.csv(temp, paste0("output/", output, "/var_", names(data), "_", sprintf("%04d", rep), ".csv"), row.names=FALSE)
+    write.csv(temp, output_path, row.names=FALSE)
   }
   print(paste0("Complete: ", names(data), "_", sprintf("%04d", rep)))
   # You can return the data and assign to variable if wish
@@ -63,11 +62,12 @@ height_variation <- function(write=TRUE, return=FALSE) {
 
 rdh <- function(hvar) {
   # log10 transform
-  hvar$H0 <- log10(hvar$H0)
+  hvar$H0 <- log10(hvar$H0 + 1e-8)
   hvar$L0 <- log10(hvar$L0)
   # plot(H0 ~ L0, hvar)
   # Mean of scales to avoid biased sampling at smaller scales
   hvar_m <- aggregate(H0 ~ L0, hvar, mean)
+
   # points(H0 ~ L0, hvar_m, col="red")
   
   # Find the height ranges at both ends of the scale
